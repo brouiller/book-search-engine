@@ -38,22 +38,22 @@ const resolvers = {
       return { token, user };
     },
   },
-  saveBook: async (parent, { args }, context) => {
+  saveBook: async (parent, { input }, context) => {
     if (context.user) {
       const book = await User.findOneAndUpdate(
         { _id: context.user._id },
-        { $addToSet: { savedBooks: args } }
+        { $addToSet: { savedBooks: input } }
       );
 
       return book;
     }
     throw new AuthenticationError("Please log in!");
   },
-  removeBook: async (parent, {args}, context) => {
+  removeBook: async (parent, {bookId}, context) => {
     if (context.user) {
       const book = await User.findOneAndUpdate(
         { _id: context.user._id },
-        { $pull: { savedBooks: { bookId: args }} }
+        { $pull: { savedBooks: { bookId: bookId }} }
       );
 
       return book;
