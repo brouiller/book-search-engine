@@ -24,9 +24,9 @@ module.exports = {
       const { data } = jwt.verify(token, secret, { maxAge: expiration });
       req.user = data;
     } catch {
-      return req;
+      console.log("super bad token");
     }
-
+    return req;
   },
   signToken: function ({ username, email, _id }) {
     const payload = { username, email, _id };

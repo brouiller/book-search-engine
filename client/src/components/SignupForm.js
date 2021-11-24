@@ -1,18 +1,29 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
-import { ADD_USER } from '../utils/mutations';
-// import { createUser } from '../utils/API';
-import Auth from '../utils/auth';
-import { useMutation } from '@apollo/client';
+import React, { useState, useEffect } from "react";
+import { Form, Button, Alert } from "react-bootstrap";
+import { ADD_USER } from "../utils/mutations";
+// import { addUser } from '../utils/API';
+import Auth from "../utils/auth";
+import { useMutation } from "@apollo/client";
 
 const SignupForm = () => {
-  const [createUser, { error }] = useMutation(ADD_USER);
+  const [addUser, { error }] = useMutation(ADD_USER);
   // set initial form state
-  const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
+  const [userFormData, setUserFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+  });
   // set state for form validation
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+  useEffect(() => {
+    if (error) {
+      setShowAlert(true);
+    } else {
+      setShowAlert(false);
+    }
+  }, [error]);
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -28,28 +39,28 @@ const SignupForm = () => {
       event.preventDefault();
       event.stopPropagation();
     }
-    console.log(userFormData);
+
     try {
-      const { response } = await createUser({
-        variables: { ...userFormData }
+      const { data } = await addUser({
+        variables: { ...userFormData },
       });
 
-      // if (!response.ok) {
+      // if (!data.ok) {
       //   throw new Error('something went wrong!');
       // }
 
-      // const { token, user } = await response.json();
+      // const { token, user } = await data.json();
       // console.log(user);
-      Auth.login(response.createUser.token);
+      Auth.login(data.addUser.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
     setUserFormData({
-      username: '',
-      email: '',
-      password: '',
+      username: "",
+      email: "",
+      password: "",
     });
   };
 
@@ -57,7 +68,7 @@ const SignupForm = () => {
     <>
       {/* This is needed for the validation functionality above */}
       <Form noValidate validated={validated} onSubmit={handleFormSubmit}>
-        {/* show alert if server response is bad */}
+        {/* show alert if server data is bad */}
         <Alert
           dismissible
           onClose={() => setShowAlert(false)}
